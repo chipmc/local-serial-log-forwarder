@@ -1,0 +1,10 @@
+[
+  {
+    "name": "boron-soak-1",
+    "path": "/dev/serial/by-id/usb-Particle_Boron_CDC_Mode_e00fce688e592afaf23ac4fb-if00"
+  },
+  {
+    "name": "photon2-soak-1",
+    "path": "/dev/serial/by-id/usb-Particle_Photon_2_0a10aced202194944a043e7c-if01"
+  }
+]
