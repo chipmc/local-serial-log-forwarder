@@ -1,10 +1,18 @@
 [
-  {
-    "name": "boron-soak-1",
-    "path": "/dev/serial/by-id/usb-Particle_Boron_CDC_Mode_e00fce688e592afaf23ac4fb-if00"
-  },
-  {
-    "name": "photon2-soak-1",
-    "path": "/dev/serial/by-id/usb-Particle_Photon_2_0a10aced202194944a043e7c-if01"
-  }
+    {
+        "name": "Boron-Dev-14",
+        "path": "/dev/serial/by-id/usb-Particle_Boron_CDC_Mode_e00fce688e592afaf23ac4fb-if00"
+    },
+    {
+        "name": "P2-Dev-01",
+        "path": "/dev/serial/by-id/usb-Particle_Photon_2_0a10aced202194944a043e7c-if01"
+    },
+    {
+        "name": "Boron-Dev-11",
+        "path": "/dev/serial/by-id/usb-Particle_Boron_CDC_Mode_e00fce683f6063bf254283dd-if00"
+    },
+    {
+        "name": "Boron-Dev-09",
+        "path": "/dev/serial/by-id/usb-Particle_Boron_CDC_Mode_e00fce68399ee6244a963935-if00"
+    }
 ]
