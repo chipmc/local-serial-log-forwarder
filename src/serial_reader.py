@@ -102,13 +102,39 @@ def monitor_device(device):
             time.sleep(2)
 
 
+def safe_monitor_device(device):
+    """Wrap device monitoring to catch thread crashes and log them prominently.
+
+    One device's failure must not cascade to other devices. If this thread crashes,
+    log the error clearly so operators can discover it via standard monitoring commands,
+    then exit to trigger systemd auto-restart.
+    """
+    name = device["name"]
+    try:
+        monitor_device(device)
+    except Exception as e:
+        error_msg = f"THREAD_CRASH: {name} monitoring thread exited: {type(e).__name__}: {e}"
+        print(error_msg, flush=True)
+
+        # Also try to write to device log (if write_log itself works)
+        try:
+            device_id = device["path"].split("_")[-1].replace("-if00", "").replace("-if01", "")
+            write_log(name, device_id, "THREAD_CRASH", str(e))
+        except Exception as write_error:
+            # If write_log is broken, at least the print() went to journalctl
+            print(f"WARNING: Could not write THREAD_CRASH to device log: {write_error}", flush=True)
+
+        # Re-raise so systemd notices the process exited abnormally and restarts
+        raise
+
+
 with open(CONFIG_FILE) as f:
     devices = json.load(f)
 
 threads = []
 
 for device in devices:
-    t = threading.Thread(target=monitor_device, args=(device,), daemon=True)
+    t = threading.Thread(target=safe_monitor_device, args=(device,), daemon=True)
     t.start()
     threads.append(t)
 
