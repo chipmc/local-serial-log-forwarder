@@ -168,6 +168,7 @@ Secrets:
 Current environment variables:
 
 - `PARTICLE_WEBHOOK_SECRET`
+- `AWS_API_KEY`
 
 Secrets are intentionally stored outside the Git repository.
 
@@ -325,6 +326,7 @@ Secrets:
 Current environment variables:
 
 - `PARTICLE_WEBHOOK_SECRET`
+- `AWS_API_KEY`
 
 Secrets are intentionally stored outside the Git repository.
 
