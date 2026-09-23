@@ -8,9 +8,10 @@ from datetime import datetime, UTC
 
 CONFIG_FILE = "/opt/serial-forwarder/config/devices.json"
 WEBHOOK_SECRET = os.environ.get("PARTICLE_WEBHOOK_SECRET")
+API_KEY = os.environ.get("AWS_API_KEY")
 BAUD_RATE = 115200
 
-API_URL = "https://dqqrzw16gk.execute-api.us-east-1.amazonaws.com/particle/log"
+API_URL = "https://ingest.seeinsights.com/particle/log"
 
 COLLECTOR_ID = "serial-forwarder-pi-01"
 
@@ -35,6 +36,9 @@ def post_to_api(device_name, device_id, event_type, message):
 
     if WEBHOOK_SECRET:
         headers["x-particle-webhook-secret"] = WEBHOOK_SECRET
+
+    if API_KEY:
+        headers["x-api-key"] = API_KEY
 
     try:
         response = requests.post(
