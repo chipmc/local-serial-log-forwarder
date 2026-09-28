@@ -85,9 +85,11 @@ def monitor_device(device):
             continue
 
         try:
-            write_log(name, device_id, "SERIAL_CONNECTING", path)
-
+            # Open the port before posting lifecycle events: each post blocks for
+            # a network round trip, and the kernel only buffers device output once
+            # the port is open. Both events are therefore logged after the open.
             with serial.Serial(path, BAUD_RATE, timeout=1) as ser:
+                write_log(name, device_id, "SERIAL_CONNECTING", path)
                 write_log(name, device_id, "SERIAL_CONNECTED", path)
                 last_state = "connected"
 

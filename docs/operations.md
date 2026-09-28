@@ -249,6 +249,26 @@ Then verify:
 
 ⸻
 
+Missing Log Line: Device or Forwarder?
+
+The local log file (/var/log/serial-forwarder/<device>.log) is written before each POST, so it is the record of what the Pi read. Check it first.
+
+Case 1: the line is in the local log but not in AWS.
+
+The forwarder lost it. There is no retry or queue; a failed POST is dropped. Confirm with the AWS_POST_FAILED entry in journalctl, normally about 3 seconds after the local timestamp (read timeout, DNS failure, or a non-2xx status).
+
+Case 2: the line is not in the local log.
+
+The forwarder never read it. Either the device never sent it, or it was lost before the Pi read it. Use the device's 10-digit millisecond prefix to tell which:
+
+* Device time jumps well ahead of wall time between two consecutive lines, or a line is torn (two lines spliced together): output was lost on the device side. This happens when the device writes faster than the forwarder drains the port, about one line per second per device, because each line waits for its POST.
+* The line would have been written before SERIAL_CONNECTING or after SERIAL_DISCONNECTED: it fell in the blind window around wake, boot, or sleep, when the port was not open.
+* Otherwise, with no gap in device time: the device most likely never printed it.
+
+SERIAL_CONNECTING and SERIAL_CONNECTED are both logged after the port is open, so the SERIAL_CONNECTING timestamp marks when capture began. A failed open logs only SERIAL_DISCONNECTED with the exception.
+
+⸻
+
 Service Will Not Start
 
 Validate configuration:
