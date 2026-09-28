@@ -263,9 +263,11 @@ The forwarder never read it. Either the device never sent it, or it was lost bef
 
 * Device time jumps well ahead of wall time between two consecutive lines, or a line is torn (two lines spliced together): output was lost on the device side. This happens when the device writes faster than the forwarder drains the port, about one line per second per device, because each line waits for its POST.
 * The line would have been written before SERIAL_CONNECTING or after SERIAL_DISCONNECTED: it fell in the blind window around wake, boot, or sleep, when the port was not open.
-* Otherwise, with no gap in device time: the device most likely never printed it.
+* Otherwise, with no gap in device time: the device most likely never printed it. This cannot be proven today: without a device-side sequence number, "never printed" and "printed but lost over USB" look identical.
 
 SERIAL_CONNECTING and SERIAL_CONNECTED are both logged after the port is open, so the SERIAL_CONNECTING timestamp marks when capture began. A failed open logs only SERIAL_DISCONNECTED with the exception.
+
+SERIAL_CONNECTING changed meaning on 2026-09-28 (commit 7312c16). Before that, it was logged before the port was opened, about 1 second earlier than the open, and a failed open logged SERIAL_CONNECTING before SERIAL_DISCONNECTED. When reading logs from before 2026-09-28, use SERIAL_CONNECTED as the moment the port opened.
 
 ⸻
 
