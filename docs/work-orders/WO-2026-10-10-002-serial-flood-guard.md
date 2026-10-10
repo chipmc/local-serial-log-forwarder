@@ -104,4 +104,22 @@ Recommendation: (B), because it is the only way AWS sees that a flood is still g
 
 **Stopped here. No code until Chip approves the rules and picks A or B.**
 
+**Approved by Chip 2026-10-10 with option B** (60 s periodic send, hard-coded). He added: a test for lines differing only after char 80, a test for the periodic send, mutation (h) "no periodic send", an `operations.md` note on timestamps.
+
 ## Closing record (budget vs actual, verdicts, Chip's deploy note)
+
+**Stage 2 (Claude Code, Opus 5.5, 2026-10-10).** `flush_run` and `log_line` added; `write_log` takes `post=True`; three constants (`KEY_LENGTH`, `MIN_RUN`, `RUN_FLUSH_SECONDS`), each with a one-line comment. Payload shape, entry point and file/stdout writes unchanged.
+Tests: `python3 -m unittest discover -s tests`, 9 tests, all pass (Python 3.14.6 on the Mac; the Pi runs 3.13). The seven handover §7 cases, plus a run of 2, after-char-80 collapse, and an endless run (261 lines at 0.5 s → flushes at 60 s and 120.5 s, then on disconnect). The only lifecycle event that can fall inside a run is a disconnect, so "lifecycle event mid-run" is a disconnect plus reconnect mid-run. Every test checks the local file holds every line.
+Pre-check of mutations by the implementer (Codex still to run them independently): each fails at least one test. (a) 8 tests, (b) 9, (c) 8, (d) 8, (e) 2, (f) 1 `test_silence_ends_run`, (g) 9, (h) 1 `test_endless_run_sends_every_60_seconds`. Extra: a key without the 80-char cut fails `test_lines_differing_only_after_char_80_collapse`.
+Correction to the handover: `parseSeverity` is at `lambda/src/utils/parse.ts:186-188` (fleet-ops 685bd0d), not 184-188. `current-state.ts` serial health branch is 328-330.
+
+| Item | Budget | Actual |
+|---|---|---|
+| `src/serial_reader.py` | +40 net | +38 net (41 added, 3 removed) |
+| `tests/test_flood_guard.py` | 150 | 143 |
+| Docs (`operations.md` + `CHANGELOG.md`) | 15 | 9 (6 + 3) |
+| This record (Step 0 + closing) | 60 | 47 so far (stages 3-5 still to add) |
+
+**Stage 3 (Codex):** pending.
+**Stage 4 (architect):** pending.
+**Stage 5 (Chip, deploy note):** pending.

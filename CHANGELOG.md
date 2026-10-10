@@ -15,3 +15,6 @@ v0.5
 
 v1.0
 - Engineering documentation
+
+Unreleased
+- AWS flood guard: repeated lines post as first line, summary, last line (WO-2026-10-10-002)
