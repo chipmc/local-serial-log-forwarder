@@ -75,4 +75,33 @@ Handover §8 applies. The two new backlog items (POST decoupling, `devices.json`
 
 ## Step 0 (Claude Code fills in)
 
+Done 2026-10-10 by Claude Code (Opus 5.5) at e27bce8. Read from the repo only; the Pi's running copy was not checked.
+
+**§3 facts:** all confirmed at the cited lines (`serial_reader.py`, 148 lines): thread per device :73/:143; `timeout=1` :91; `readline` :97; empty-read loop :98-99; decode/strip :101; skip empty :102; `write_log` :103 → print :65, append :67-68, `post_to_api` :70; POST 3 s, no retry :44-49; failure printed and dropped :51-58; `last_state` :77 is the only cross-line state. One more: `THREAD_CRASH` (:128) also goes through `write_log` and is lifecycle.
+**§5 facts:** confirmed at fleet-ops 685bd0d, with one correction: `parseSeverity` is `parse.ts:186-188` (handover says 184-188). Serial health branch `current-state.ts:328-330`. Summary text `[forwarder] INFO: previous line repeated N times` parses as INFO (checked against the same regex).
+**Fixture:** the three TimeDiag lines are 81 chars and map to one key (`########## [app] INFO: TimeDiag: tz=SGT-# valid=# epoch=########## utc=####-##-#`). They differ only in digits, so they do not exercise the 80-char cut; the reviewer should add one pair that differs only after char 80.
+
+**Key:** `re.sub(r"\d", "#", line)[:80]`, as suggested. No new evidence for a different key.
+
+**Flush rules** (state in `monitor_device`: key, count, held line):
+1. Line 1 of a run: post at once. Line 2+: hold it (replacing any earlier held line); not posted yet.
+2. Run ends (new key, silence, lifecycle event): count 2 → post the held line; count ≥3 → post summary with N = count − 2 (lines not posted), then the held line. Then reset.
+3. A run of 2 therefore still posts both lines, but the second is delayed until the run ends. A run of 3 posts 3 events (no saving), per decision 3.
+4. Local file and stdout are written for every line before any of this, unchanged.
+
+**§6 answers:**
+- Silence: an empty `readline()` (:98) means ≥1 s with no bytes; flush there. Disconnect: flush first thing in the `except` at :105, before `SERIAL_DISCONNECTED`. `SERIAL_MISSING`/`CONNECTING`/`CONNECTED` start a fresh run state, so nothing can be pending then.
+- Truncated tail: ignored automatically: the device truncates at 182 chars, the key stops at 80.
+- Order: one thread posts serially and each POST blocks, so AWS receives first → summary → last → next line in that order. Caveat: `timestamp` is set at post time (:31), so the held line carries its flush time, not its read time (up to ~1 s later on silence). Payload shape unchanged.
+
+**Open point for Chip (one decision needed):** "never held indefinitely" is not met by the rules above. If the device repeats one message with gaps under 1 s and nothing else in between, there is no silence and no new key, so the summary and last line wait until the flood stops or the port drops. Two options:
+- (A) Accept it. AWS still has the first line and the local log has everything. No extra code.
+- (B) Add a third constant: flush the run (summary + held line) after 60 s and keep going. About +3 lines. During an endless flood AWS would get ~3 events a minute.
+Recommendation: (B), because it is the only way AWS sees that a flood is still going. Your call; it is the "gate" the WO says to ask about.
+
+**Test harness:** pyserial and requests are not installed locally and the module loads `CONFIG_FILE` and starts threads at import (:137-148). Tests will stub `serial`/`requests` in `sys.modules` and patch `open` to return `[]` during import, so no `__main__` guard is needed and the entry point is untouched.
+**Budget:** expect about +25 lines with (A), +28 with (B), inside +40.
+
+**Stopped here. No code until Chip approves the rules and picks A or B.**
+
 ## Closing record (budget vs actual, verdicts, Chip's deploy note)
