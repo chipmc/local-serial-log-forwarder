@@ -118,8 +118,8 @@ Correction to the handover: `parseSeverity` is at `lambda/src/utils/parse.ts:186
 | `src/serial_reader.py` | +40 net | +38 net (41 added, 3 removed) |
 | `tests/test_flood_guard.py` | 150 | 143 |
 | Docs (`operations.md` + `CHANGELOG.md`) | 15 | 9 (6 + 3) |
-| This record (Step 0 + closing) | 60 | 47 so far (stages 3-5 still to add) |
+| This record (Step 0 + closing) | 60 | 47 (stage 5 note still to add) |
 
-**Stage 3 (Codex):** pending.
-**Stage 4 (architect):** pending.
+**Stage 3 (Codex `gpt-5.6-sol`, high reasoning, 2026-10-11): VERDICT CLEAN.** Ran in a fresh clone at fa19c68 with its own mutations, not the implementer's script. Baseline: 9 tests passed. All nine mutations killed: (a) 8 tests, (b) 9, (c) 8, (d) 8, (e) 2, (f) 1 `test_silence_ends_run`, (g) 9, (h) 1 `test_endless_run_sends_every_60_seconds`, (i) no 80-char cut: 1 `test_lines_differing_only_after_char_80_collapse`. Claims check (constants commented, summary severity INFO and not quoting the line, payload shape unchanged from e27bce8, every line to file and stdout): OK. Other findings: none. Clone left clean.
+**Stage 4 (architect):** done before stage 3, per Chip (2026-10-11).
 **Stage 5 (Chip, deploy note):** pending.
