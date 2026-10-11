@@ -4,10 +4,12 @@ Near term
 
 Reliability
 
-* add POST retry/backoff
-* add local queue for failed cloud sends
 * add health heartbeat event
 * add collector self-status event
+
+Considered and not justified (investigation of 2026-09-25 to 2026-09-28, see results-2026-09-29-port-open-reorder.md for the follow-up measurement):
+
+* POST retry/backoff and a local queue for failed cloud sends: measured loss between the Pi and AWS on 2026-09-25 was 0 to 0.13% per device, and retrying timed-out posts risks duplicates, because some timed-out posts were stored anyway.
 
 ⸻
 
@@ -23,7 +25,6 @@ Parsing
 
 Fleet scale
 
-* expand from 2 to 4 devices
 * support dynamic hot-plug
 * add per-device config metadata
 
