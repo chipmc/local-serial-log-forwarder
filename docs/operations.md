@@ -269,6 +269,12 @@ SERIAL_CONNECTING and SERIAL_CONNECTED are both logged after the port is open, s
 
 SERIAL_CONNECTING changed meaning on 2026-09-28 (commit 7312c16). Before that, it was logged before the port was opened, about 1 second earlier than the open, and a failed open logged SERIAL_CONNECTING before SERIAL_DISCONNECTED. When reading logs from before 2026-09-28, use SERIAL_CONNECTED as the moment the port opened.
 
+Repeated-Line Guard (AWS only)
+
+When a device prints the same message three or more times in a row, AWS gets only the first line, one "[forwarder] INFO: previous line repeated N times" summary, and the last line. Lines count as the same message when their first 80 characters match once digits are ignored. A run ends at a different message, 1 second of silence, or a disconnect; a run that never ends is still sent every 60 seconds. The local log and journalctl keep every line, so a line missing from AWS inside such a run is not a lost POST (Case 1): check the local log.
+
+AWS timestamps are send time; the local log keeps read time. For the last line of a run, AWS shows when the run ended (up to about 1 second later on silence), not when the line was read. Use the local log for exact timing.
+
 ⸻
 
 Service Will Not Start
