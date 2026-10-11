@@ -28,7 +28,6 @@ Fleet scale
 
 * support dynamic hot-plug
 * add per-device config metadata
-* reconcile `config/devices.json` with the Pi's live `/opt/serial-forwarder/config/devices.json`: the repo copy (at e27bce8) still lists P2-Dev-01, which was removed from the forwarder during the soak. Chip confirms which copy is correct, then the repo is made to match.
 
 ⸻
 
